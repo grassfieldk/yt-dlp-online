@@ -1,0 +1,17 @@
+[Unit]
+Description=yt-dlp Web API
+After=network.target
+
+[Service]
+Type=simple
+# Replace with your actual username
+User=pi
+# Replace with the absolute path to this repository
+WorkingDirectory=/home/pi/yt-dlp-online
+ExecStart=/home/pi/yt-dlp-online/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+EnvironmentFile=/home/pi/yt-dlp-online/.env
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
