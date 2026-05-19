@@ -1,8 +1,10 @@
+import os
 import shutil
 from typing import Optional
 
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .auth import verify_api_key
@@ -16,6 +18,9 @@ app = FastAPI(
     ),
     version="1.0.0",
 )
+
+# Create API router with /api prefix
+api_router = APIRouter(prefix="/api")
 
 
 class DownloadRequest(BaseModel):
@@ -31,13 +36,13 @@ class DownloadRequest(BaseModel):
     )
 
 
-@app.get("/health", tags=["System"], summary="Health check")
+@api_router.get("/health", tags=["System"], summary="Health check")
 def health():
     """Returns 200 OK when the service is running."""
     return {"status": "ok"}
 
 
-@app.post(
+@api_router.post(
     "/download",
     tags=["Video"],
     summary="Download a video",
@@ -65,7 +70,7 @@ def download(req: DownloadRequest, background_tasks: BackgroundTasks):
     )
 
 
-@app.get(
+@api_router.get(
     "/formats",
     tags=["Video"],
     summary="List available formats",
@@ -81,3 +86,18 @@ def formats(url: str = Query(..., description="Video URL to inspect")):
         return get_formats(url)
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
+
+
+# Include API router
+app.include_router(api_router)
+
+# Mount static files
+static_dir = os.path.join(os.path.dirname(__file__), "ui", "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+@app.get("/ui", tags=["UI"])
+def ui():
+    """Serve the web UI."""
+    ui_path = os.path.join(os.path.dirname(__file__), "ui", "index.html")
+    return FileResponse(ui_path)
