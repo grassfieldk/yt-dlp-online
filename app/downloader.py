@@ -1,11 +1,15 @@
 import os
 import shutil
+import sys
 import tempfile
 from typing import Optional
 
-import yt_dlp
-
 from .config import settings
+
+if settings.yt_dlp_path:
+    sys.path.insert(0, settings.yt_dlp_path)
+
+import yt_dlp
 
 # Maps quality preset (video height in pixels) to a yt-dlp format selection string.
 # Each entry falls back through progressively looser constraints so a result is

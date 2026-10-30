@@ -13,5 +13,8 @@ class Settings(BaseSettings):
     # Default video height cap in pixels (1080 / 720 / 480 / 0 for best available)
     default_quality: int = 1080
 
+    # Optional yt-dlp zipapp path shared with the command-line installation
+    yt_dlp_path: str | None = None
+
 
 settings = Settings()

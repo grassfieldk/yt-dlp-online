@@ -20,6 +20,7 @@ python -m venv .venv
 # 3. Configure
 cp .env.example .env
 # Edit .env and set a strong API_KEY
+# Set YT_DLP_PATH to the path shown by `command -v yt-dlp` to share the CLI version
 
 # 4. Start the server (for testing)
 .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
